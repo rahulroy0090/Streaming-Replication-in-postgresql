@@ -23,9 +23,9 @@ sleep 10
 
 # Set permissions for directories to avoid permission denied errors
 #echo "Setting Permissions for Directories"
-#podman unshare chown -R 999:999 /home/ldap/data/psql/master
-#podman unshare chown -R 999:999 /home/ldap/data/psql/slave
-#podman unshare chown -R 999:999 /home/ldap/data/psql/repl
+#podman unshare chown -R 999:999 /home/rahul/data/psql/master
+#podman unshare chown -R 999:999 /home/rahul/data/psql/slave
+#podman unshare chown -R 999:999 /home/rahul/data/psql/repl
 
 # Sleep for another 20 seconds to ensure permissions are set before container creation
 echo "Sleeping for another 20 seconds"
