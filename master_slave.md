@@ -2,13 +2,10 @@
 
 
 ```
-## Create the script file
+ #!/bin/bash
 
-#!/bin/bash
-
-# Create a Podman network named postnetwork with subnet 172.18.0.0/24
-echo "Creating Podman Network: postnetwork"
-#podman network create --subnet=172.18.0.0/24 postnetwork
+# Create a Podman network named rahulnetwork with subnet 172.19.0.0/24
+echo "Creating Podman Network: rahulnetwork"
 podman network create --subnet=172.19.0.0/24 rahulnetwork
 
 # Create directories for mount volumes
@@ -16,20 +13,6 @@ echo "Creating Directories for Mount Volumes"
 mkdir -p /home/rahul/data/psql/master
 mkdir -p /home/rahul/data/psql/slave
 mkdir -p /home/rahul/data/psql/repl
-
-# Sleep for 10 seconds to allow network and directory operations to complete
-echo "Sleeping for 10 seconds"
-sleep 10
-
-# Set permissions for directories to avoid permission denied errors
-#echo "Setting Permissions for Directories"
-#podman unshare chown -R 999:999 /home/rahul/data/psql/master
-#podman unshare chown -R 999:999 /home/rahul/data/psql/slave
-#podman unshare chown -R 999:999 /home/rahul/data/psql/repl
-
-# Sleep for another 20 seconds to ensure permissions are set before container creation
-echo "Sleeping for another 20 seconds"
-sleep 20
 
 # Run Master Container
 echo "Running Master Container"
@@ -42,9 +25,11 @@ podman run -d \
   -v /home/rahul/data/psql/master:/var/lib/postgresql/data \
   docker.io/postgres
 
-# Sleep for 10 seconds to allow the master container to start before running the slave container
-echo "Sleeping for 10 seconds"
-sleep 10
+# Wait for the Master container to be ready
+echo "Waiting for Master container to be ready"
+until podman exec master pg_isready -q; do
+  sleep 1
+done
 
 # Run Slave Container
 echo "Running Slave Container"
@@ -58,6 +43,13 @@ podman run -d \
   -v /home/rahul/data/psql/repl:/var/lib/postgresql/repl \
   docker.io/postgres
 
+# Wait for the Slave container to be ready
+echo "Waiting for Slave container to be ready"
+until podman exec slave pg_isready -q; do
+  sleep 1
+done
+
+echo "Containers are up and running!"
 
 ```
 
